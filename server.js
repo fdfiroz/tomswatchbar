@@ -56,8 +56,12 @@ export default {
 
       return response;
     } catch (error) {
-      console.error(error);
-      return new Response('An unexpected error occurred', {status: 500});
+      console.error('Server Error:', error);
+      console.error('Error Stack:', error.stack);
+      return new Response(
+        `An unexpected error occurred: ${error.message || 'Unknown error'}\n\nStack: ${error.stack || 'No stack trace'}`,
+        {status: 500, headers: {'Content-Type': 'text/plain'}},
+      );
     }
   },
 };

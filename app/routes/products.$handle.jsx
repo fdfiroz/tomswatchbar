@@ -7,10 +7,14 @@ import {
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
-import {ProductPrice} from '~/components/ProductPrice';
-import {ProductImage} from '~/components/ProductImage';
-import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {BookingProvider, useBooking} from '~/contexts/BookingContext';
+import {EventInfoInput} from '~/components/booking/EventInfoInput';
+import {EventInfoPreview} from '~/components/booking/EventInfoPreview';
+import {MenuStep} from '~/components/booking/MenuStep';
+import {BeverageStep} from '~/components/booking/BeverageStep';
+import {OverviewStep} from '~/components/booking/OverviewStep';
+import {SummarySidebar} from '~/components/booking/SummarySidebar';
 
 /**
  * @type {Route.MetaFunction}
@@ -97,37 +101,9 @@ export default function Product() {
   // only when no search params are set in the url
   useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
 
-  // Get the product options array
-  const productOptions = getProductOptions({
-    ...product,
-    selectedOrFirstAvailableVariant: selectedVariant,
-  });
-
-  const {title, descriptionHtml} = product;
-
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
-      <div className="product-main">
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
-        />
-        <br />
-        <ProductForm
-          productOptions={productOptions}
-          selectedVariant={selectedVariant}
-        />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
-      </div>
+    <BookingProvider>
+      <ProductBookingWizard product={product} selectedVariant={selectedVariant} />
       <Analytics.ProductView
         data={{
           products: [
@@ -143,6 +119,58 @@ export default function Product() {
           ],
         }}
       />
+    </BookingProvider>
+  );
+}
+
+/**
+ * Product Booking Wizard Component
+ * Handles the 4-step booking process
+ */
+function ProductBookingWizard({product, selectedVariant}) {
+  const {currentStep} = useBooking();
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="booking-step-1">
+            <EventInfoInput />
+          </div>
+        );
+      case 2:
+        return (
+          <div className="booking-step-2">
+            <MenuStep />
+          </div>
+        );
+      case 3:
+        return (
+          <div className="booking-step-3">
+            <BeverageStep />
+          </div>
+        );
+      case 4:
+        return (
+          <div className="booking-step-4">
+            <OverviewStep product={product} selectedVariant={selectedVariant} />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="product-booking p-5 max-w-7xl mx-auto">
+      <div className="booking-container flex gap-5 flex-wrap">
+        <div className="booking-main flex-1 min-w-[300px]">
+          {renderStep()}
+        </div>
+        <div className="booking-sidebar w-[350px] min-w-[300px]">
+          <SummarySidebar />
+        </div>
+      </div>
     </div>
   );
 }
