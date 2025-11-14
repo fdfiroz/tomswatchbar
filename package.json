@@ -33,7 +33,7 @@
     "@react-router/fs-routes": "7.9.2",
     "@shopify/cli": "3.84.1",
     "@shopify/hydrogen-codegen": "^0.3.3",
-    "@shopify/mini-oxygen": "^3.2.1",
+    "@shopify/mini-oxygen": "^4.0.0",
     "@shopify/oxygen-workers-types": "^4.1.6",
     "@shopify/prettier-config": "^1.1.2",
     "@tailwindcss/postcss": "^4.1.17",
